@@ -28,7 +28,7 @@ port = 12346
 
 
 s.connect((dst_ip, port))
-print("Connection established")
+print("Connection established with cache server")
 while True:
     try:
         
