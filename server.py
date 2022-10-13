@@ -1,12 +1,12 @@
 server_ip = "10.0.1.3"
-
 import socket
 import http.server
 
 #WRITE CODE HERE:
 #1. Create a KEY-VALUE pairs (Create a dictionary OR Maintain a text file for KEY-VALUES).
 key_val = dict()
-
+# uncomment the next line for directly using the dictionary of keys and their values
+# key_val = {'key1': 'val1', 'key2': 'val2', 'key3': 'val3', 'key4': 'val4', 'key5': 'val5', 'key6': 'val6'}
 
 
 dst_ip = "10.0.1.3"#str(input("Enter Server IP: "))
@@ -26,12 +26,18 @@ while True:
   
   try:
     c, addr = s.accept()
-    print ('Got connection from', addr )
+    print ('Got connection from: ', addr )
     # recvmsg = c.recv(1024).decode()
     # print('Server received '+ recvmsg)
     while True:
       recvmsg = c.recv(1024).decode()
-      print('Server received '+ recvmsg)
+      print('Server received: '+ recvmsg)
+      if recvmsg == "q":
+        print('Client has been disconnected')
+        break
+      if recvmsg == "KeyboardInterrupt":
+        print('Client has been disconnected due to interrupt')
+        break
       
       # c.send('Hello client'.encode())
 
@@ -63,16 +69,16 @@ while True:
           key_val.pop(rec_key)
           c.send("Delete success!".encode())
         else:
-          c.send("Delete failure!".encode())
+          c.send("Delete failure!: Key does not exist".encode())
       else:
-        c.send("Invalid request!".encode())
+        c.send("Invalid request!: Command not found".encode())
       print("Key Val: ", key_val)
 
       ##################
 
     c.close()
-  except:
-    # print("Error while accepting connection")
+  except socket.error as e:
+    print("Error: ", e)
     c.close()
     break
   #break

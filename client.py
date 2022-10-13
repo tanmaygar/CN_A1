@@ -1,9 +1,7 @@
 client_ip = "10.0.1.1"
-
 import socket
 import http.client
 import time
-# from socket import *
 
 cacheIP = "10.0.1.2"
 
@@ -38,19 +36,21 @@ while True:
         # if request is q then close and break
         if req == "q":
             print("Closing Program")
+            s.send(req.encode())
             s.close()
             break
+
         req = req.split(" ")
 
         # if request is not of length 3 then invalid
         if len(req) != 2: #len(req) != 3:
-            print("Invalid request")
+            print("Invalid request: Length not 2")
             continue
 
         # if request is get and http/1.1
         #elif req[0] == "GET" and req[2] == "HTTP/1.1":
         elif req[0] == "GET":
-            print("get")
+            # print("get")
             #req_2 = req[1].split("=")
             req_2 = req[1]
 
@@ -66,13 +66,13 @@ while True:
         # if request is put and http/1.1
         # elif req[0] == "PUT" and req[2] == "HTTP/1.1":
         elif req[0] == "PUT":
-            print("put")
+            # print("put")
             # req_2 = req[1].split("/")
             req_2 = req[1].split("/")
             # if put request is not /assignment1/{key}/{value} then invalid
             # if len(req_2) != 4 or req_2[1] != "assignment1":
             if len(req_2) != 2:
-                print("Invalid request")
+                print("Invalid request: Input should be key/val")
                 continue
             og_req = "PUT /assignment1/{key}/{val} HTTP/1.1".format(key=req_2[0], val=req_2[1])
             print("Request: ", og_req )
@@ -83,7 +83,7 @@ while True:
         # if request is delete and http/1.1
         # elif req[0] == "DELETE" and req[2] == "HTTP/1.1":
         elif req[0] == "DELETE":
-            print("delete")
+            # print("delete")
             # req_2 = req[1].split("/")
             req_2 = req[1]
             # if put request is not /assignment1/{key} then invalid
@@ -96,11 +96,14 @@ while True:
             print("Client received " + s.recv(1024).decode())
 
         else:
-            print("Invalid request")
+            print("Invalid request: No command found")
             continue
     
         #s.close()
-
+    except KeyboardInterrupt:
+        s.send("KeyboardInterrupt".encode())
+        s.close()
+        break
     except socket.error as e:
         print("Connection closed: ", e)
         s.close()

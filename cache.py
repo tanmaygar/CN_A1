@@ -21,12 +21,20 @@ socket_client.listen(5)
 print("Connection with client established")
 
 while True:
+    
     try:
         c, addr = socket_client.accept()
         print ('Got connection from: ', addr )
         while True:
             recvmsg = c.recv(1024).decode()
             print('Cache received: '+ recvmsg)
+            if recvmsg == "q":
+                print('Client has been disconnected')
+                break
+            if recvmsg == "KeyboardInterrupt":
+                print('Client has been disconnected due to interrupt')
+                break
+
             rec_req = recvmsg.split(" ")
             rec_method = rec_req[0]
             rec_url = rec_req[1]
@@ -37,8 +45,11 @@ while True:
                 else:
                     socket_server.send(recvmsg.encode())
                     rec_val = socket_server.recv(1024).decode()
-                    key_val[rec_key] = rec_val
-                    c.send(rec_val.encode())
+                    if rec_val == "No such key exists!":
+                        c.send(rec_val.encode())
+                    else:
+                        key_val[rec_key] = rec_val
+                        c.send(rec_val.encode())
 
             elif rec_method == "PUT":
                 rec_key = rec_url.split("/")[2]
@@ -59,7 +70,7 @@ while True:
                     if recmsg == "Delete success!":
                         c.send("Delete success!".encode())
                     else:
-                        c.send("Delete failure!".encode())
+                        c.send("Delete failure!: Key does not exist".encode())
                         
             else:
                 c.send("Invalid request!".encode())
