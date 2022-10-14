@@ -13,20 +13,22 @@ port_client = 12346
 port_server = 12346
 port_cache = 12346
 
-socket_server.connect((server_ip, port_server))
-print("Connection with server established")
+# socket_server.connect((server_ip, port_server))
+# print("Connection with server established")
 
 socket_client.bind((cache_ip, port_client))
 socket_client.listen(5)
 print("Connection with client established")
-
+tmp = ""
 while True:
+    isPresent = True
     
     try:
         c, addr = socket_client.accept()
         print ('Got connection from: ', addr )
         while True:
             recvmsg = c.recv(1024).decode()
+            tmp = recvmsg
             print('Cache received: '+ recvmsg)
             if recvmsg == "q":
                 print('Client has been disconnected')
@@ -43,13 +45,19 @@ while True:
                 if rec_key in key_val:
                     c.send(key_val[rec_key].encode())
                 else:
-                    socket_server.send(recvmsg.encode())
-                    rec_val = socket_server.recv(1024).decode()
-                    if rec_val == "No such key exists!":
-                        c.send(rec_val.encode())
-                    else:
-                        key_val[rec_key] = rec_val
-                        c.send(rec_val.encode())
+                    isPresent = False
+                    break
+                    # socket_server.connect((server_ip, port_server))
+                    # print("Connection with server established")
+                    # socket_server.send(recvmsg.encode())
+                    # rec_val = socket_server.recv(1024).decode()
+                    # if rec_val == "No such key exists!":
+                    #     c.send(rec_val.encode())
+                    # else:
+                    #     key_val[rec_key] = rec_val
+                    #     c.send(rec_val.encode())
+                    # print("Connection with server closed")
+                    # socket_server.close()
 
             elif rec_method == "PUT":
                 rec_key = rec_url.split("/")[2]
@@ -74,7 +82,22 @@ while True:
                         
             else:
                 c.send("Invalid request!".encode())
-    except:
+        if isPresent == False:
+            print("not here")
+            socket_server.connect((server_ip, port_server))
+            print("Connection with server established")
+            socket_server.send(tmp.encode())
+            rec_val = socket_server.recv(1024).decode()
+            if rec_val == "No such key exists!":
+                c.send(rec_val.encode())
+            else:
+                key_val[rec_key] = rec_val
+                c.send(rec_val.encode())
+            # socket_server.close()
+
+
+    except socket.error as e:
+        print(e)
         #print("Connection failed")
         socket_server.close()
         socket_client.close()

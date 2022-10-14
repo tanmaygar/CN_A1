@@ -25,6 +25,7 @@ print ("socket is listening")
 while True:
   
   try:
+    print("Waiting")
     c, addr = s.accept()
     print ('Got connection from: ', addr )
     # recvmsg = c.recv(1024).decode()
@@ -38,6 +39,8 @@ while True:
       if recvmsg == "KeyboardInterrupt":
         print('Client has been disconnected due to interrupt')
         break
+      # if recvmsg == "":
+      #   continue
       
       # c.send('Hello client'.encode())
 
@@ -73,9 +76,10 @@ while True:
       else:
         c.send("Invalid request!: Command not found".encode())
       print("Key Val: ", key_val)
+      # c.close()
 
       ##################
-
+    print("Here now")
     c.close()
   except socket.error as e:
     print("Error: ", e)
