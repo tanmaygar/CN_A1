@@ -58,10 +58,10 @@ while True:
             # if len(req_2) != 2 or req_2[0] != "/assignment1?request":
             #     print("Invalid request")
             #     continue
-            og_req = "GET /assignment1?request={key} HTTP/1.1".format(key=req_2)
+            og_req = "GET /assignment1?request={key} HTTP/1.1\r\n\r\n".format(key=req_2)
             print("Request: ", og_req )
             s.send(og_req.encode())
-            print("Client received " + s.recv(1024).decode())
+            print("Client received: " + s.recv(1024).decode())
 
         # if request is put and http/1.1
         # elif req[0] == "PUT" and req[2] == "HTTP/1.1":
@@ -74,10 +74,10 @@ while True:
             if len(req_2) != 2:
                 print("Invalid request: Input should be key/val")
                 continue
-            og_req = "PUT /assignment1/{key}/{val} HTTP/1.1".format(key=req_2[0], val=req_2[1])
+            og_req = "PUT /assignment1/{key}/{val} HTTP/1.1\r\n\r\n".format(key=req_2[0], val=req_2[1])
             print("Request: ", og_req )
             s.send(og_req.encode())
-            print("Client received " + s.recv(1024).decode())
+            print("Client received: " + s.recv(1024).decode())
 
 
         # if request is delete and http/1.1
@@ -90,10 +90,10 @@ while True:
             # if len(req_2) != 3 or req_2[1] != "assignment1":
             #     print("Invalid request")
             #     continue
-            og_req = "DELETE /assignment1/{key} HTTP/1.1".format(key=req_2)
+            og_req = "DELETE /assignment1/{key} HTTP/1.1\r\n\r\n".format(key=req_2)
             print("Request: ", og_req )
             s.send(og_req.encode())
-            print("Client received " + s.recv(1024).decode())
+            print("Client received: " + s.recv(1024).decode())
 
         else:
             print("Invalid request: No command found")

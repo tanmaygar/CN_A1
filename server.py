@@ -1,13 +1,11 @@
 server_ip = "10.0.1.3"
 import socket
 import http.server
-
 #WRITE CODE HERE:
 #1. Create a KEY-VALUE pairs (Create a dictionary OR Maintain a text file for KEY-VALUES).
 key_val = dict()
 # uncomment the next line for directly using the dictionary of keys and their values
 # key_val = {'key1': 'val1', 'key2': 'val2', 'key3': 'val3', 'key4': 'val4', 'key5': 'val5', 'key6': 'val6'}
-
 
 dst_ip = "10.0.1.3"#str(input("Enter Server IP: "))
 
@@ -25,7 +23,6 @@ print ("socket is listening")
 while True:
   
   try:
-    print("Waiting")
     c, addr = s.accept()
     print ('Got connection from: ', addr )
     # recvmsg = c.recv(1024).decode()
@@ -39,8 +36,8 @@ while True:
       if recvmsg == "KeyboardInterrupt":
         print('Client has been disconnected due to interrupt')
         break
-      # if recvmsg == "":
-      #   continue
+      if recvmsg == "":
+        break
       
       # c.send('Hello client'.encode())
 
@@ -58,28 +55,29 @@ while True:
       if rec_method == "GET":
         rec_key = rec_url.split("=")[1]
         if rec_key in key_val:
-          c.send(key_val[rec_key].encode())
+          msg = "HTTP/1.1 200 OK\r\n\r\n" + key_val[rec_key]
+          c.send(msg.encode())
         else:
-          c.send("No such key exists!".encode())
+          msg = "HTTP/1.1 404 Not Found\r\n\r\nNo such key exists!"
+          c.send(msg.encode())
       elif rec_method == "PUT":
         rec_key = rec_url.split("/")[2]
         rec_val = rec_url.split("/")[3]
         key_val[rec_key] = rec_val
-        c.send("Push sucess!".encode())
+        c.send("HTTP/1.1 200 OK\r\n\r\nPush sucess!".encode())
       elif rec_method == "DELETE":
         rec_key = rec_url.split("/")[2]
         if rec_key in key_val:
           key_val.pop(rec_key)
-          c.send("Delete success!".encode())
+          c.send("HTTP/1.1 200 OK\r\n\r\nDelete success!".encode())
         else:
-          c.send("Delete failure!: Key does not exist".encode())
+          c.send("HTTP/1.1 404 Not Found\r\n\r\nDelete failure!: Key does not exist".encode())
       else:
-        c.send("Invalid request!: Command not found".encode())
+        c.send("HTTP/1.1 400 Bad Request\r\n\r\nInvalid request!: Command not found".encode())
       print("Key Val: ", key_val)
       # c.close()
 
       ##################
-    print("Here now")
     c.close()
   except socket.error as e:
     print("Error: ", e)
